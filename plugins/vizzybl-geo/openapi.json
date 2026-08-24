@@ -1,0 +1,987 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Vizzybl Public API",
+    "version": "1.0.0",
+    "description": "A brand's GEO / AI-search visibility, plus metered write actions (run an audit, create prompts, re-scrape a prompt). Generated from src/lib/apiKeys/apiPolicy.ts by scripts/gen-openapi.ts — do not edit by hand."
+  },
+  "servers": [
+    {
+      "url": "https://vizzybl.ai/api/v1"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Vizzybl API key (format vzbl_live_…), created under Settings → API Keys."
+      }
+    },
+    "parameters": {
+      "limit": {
+        "name": "limit",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "default": 50,
+          "maximum": 200
+        }
+      },
+      "cursor": {
+        "name": "cursor",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        },
+        "description": "Opaque pagination token from a previous pagination.nextCursor."
+      },
+      "startDate": {
+        "name": "startDate",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      "endDate": {
+        "name": "endDate",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      "engines": {
+        "name": "engines",
+        "in": "query",
+        "style": "form",
+        "explode": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "chatgpt",
+              "gemini",
+              "claude",
+              "perplexity",
+              "grok",
+              "google_aio",
+              "google_ai_mode",
+              "copilot"
+            ]
+          }
+        }
+      }
+    },
+    "responses": {
+      "Unauthenticated": {
+        "description": "Missing/invalid/revoked/expired API key"
+      },
+      "Forbidden": {
+        "description": "Insufficient scope or non-Ultra/Enterprise tier"
+      },
+      "RateLimited": {
+        "description": "Rate limited; honour Retry-After"
+      },
+      "InsufficientCredits": {
+        "description": "Not enough credits for this metered action"
+      }
+    }
+  },
+  "paths": {
+    "/brand/me": {
+      "get": {
+        "summary": "Tenant brand identity (name, domain, competitors, industries, markets).",
+        "x-required-scope": "read:brand",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      }
+    },
+    "/engines": {
+      "get": {
+        "summary": "AI answer engines supported/tracked.",
+        "x-required-scope": "read:brand",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      }
+    },
+    "/quota": {
+      "get": {
+        "summary": "Credit balance, tier, and per-feature quota usage.",
+        "x-required-scope": "read:brand",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      }
+    },
+    "/stats": {
+      "get": {
+        "summary": "One-call rollup: brand, latest visibility, top competitors, SoV/rank trend, monitored-prompt count.",
+        "x-required-scope": "read:visibility",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/startDate"
+          },
+          {
+            "$ref": "#/components/parameters/endDate"
+          }
+        ]
+      }
+    },
+    "/visibility": {
+      "get": {
+        "summary": "Daily share-of-voice / visibility history (mentions, rank, sentiment, competitors).",
+        "x-required-scope": "read:visibility",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/startDate"
+          },
+          {
+            "$ref": "#/components/parameters/endDate"
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          },
+          {
+            "name": "byEngine",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Attach a per-engine share-of-voice breakdown to each day (best-effort)."
+          }
+        ]
+      }
+    },
+    "/prompts": {
+      "get": {
+        "summary": "Monitored prompts with aggregated metrics.",
+        "x-required-scope": "read:prompts",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "\"monitored\" (active+partial) or a specific PromptStatus."
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "ISO country code (case-insensitive)."
+          },
+          {
+            "name": "funnelStage",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "top",
+                "middle",
+                "bottom"
+              ]
+            }
+          },
+          {
+            "name": "intentType",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "branded",
+                "unbranded",
+                "competitive"
+              ]
+            }
+          },
+          {
+            "name": "customTag",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by a custom tag value, formatted \"<dimensionId>:<valueId>\"."
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create monitored prompts (batch ≤50; `preview` dry-run available). Free to create; scraping is metered.",
+        "x-required-scope": "write:prompts",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "202": {
+            "description": "Accepted — async; poll the matching GET"
+          },
+          "400": {
+            "description": "Invalid parameter, or a disallowed audit URL (BLOCKED)"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "texts"
+                ],
+                "properties": {
+                  "texts": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 50,
+                    "items": {
+                      "type": "string",
+                      "maxLength": 2000
+                    }
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "ISO country code. Defaults to US."
+                  },
+                  "preview": {
+                    "type": "boolean",
+                    "description": "Dry run — reports what would be created without writing."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prompts/{promptId}": {
+      "get": {
+        "summary": "Single prompt detail.",
+        "x-required-scope": "read:prompts",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "name": "promptId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/prompts/{promptId}/metrics-history": {
+      "get": {
+        "summary": "Daily metrics time-series for a prompt.",
+        "x-required-scope": "read:prompts",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "name": "promptId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/startDate"
+          },
+          {
+            "$ref": "#/components/parameters/endDate"
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          }
+        ]
+      }
+    },
+    "/prompt-responses": {
+      "get": {
+        "summary": "Verbatim AI engine answers with citations, brand mentions, and sentiment.",
+        "x-required-scope": "read:responses",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "name": "promptId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/engines"
+          },
+          {
+            "name": "brandMentioned",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/startDate"
+          },
+          {
+            "$ref": "#/components/parameters/endDate"
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          }
+        ]
+      }
+    },
+    "/citations": {
+      "get": {
+        "summary": "Cited domains/URLs aggregated across AI answers.",
+        "x-required-scope": "read:citations",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/engines"
+          },
+          {
+            "$ref": "#/components/parameters/startDate"
+          },
+          {
+            "$ref": "#/components/parameters/endDate"
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          }
+        ]
+      }
+    },
+    "/citations/prompts": {
+      "get": {
+        "summary": "Reverse lookup — which monitored prompts cite a given URL or domain.",
+        "x-required-scope": "read:citations",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Exact cited URL. Provide url OR domain."
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Cited domain. Provide url OR domain."
+          },
+          {
+            "$ref": "#/components/parameters/engines"
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          }
+        ]
+      }
+    },
+    "/citations/stats": {
+      "get": {
+        "summary": "Aggregated citation stats — domain rank, citation share, most-cited URLs, per-competitor breakdown, source-type distribution.",
+        "x-required-scope": "read:citations",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/startDate"
+          },
+          {
+            "$ref": "#/components/parameters/endDate"
+          },
+          {
+            "name": "domainLimit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 500
+            }
+          }
+        ]
+      }
+    },
+    "/recommendations": {
+      "get": {
+        "summary": "Unified recommendation feed merging the Actions Board and nightly Findings/Insights.",
+        "x-required-scope": "read:recommendations",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "all",
+                "suggested",
+                "pending",
+                "in_progress",
+                "completed",
+                "ignored"
+              ]
+            },
+            "description": "Default \"active\" (pending+in_progress+suggested)."
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "action",
+                "finding"
+              ]
+            }
+          },
+          {
+            "name": "priority",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "critical",
+                "high",
+                "medium",
+                "low"
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          }
+        ]
+      }
+    },
+    "/bot-traffic": {
+      "get": {
+        "summary": "AI-bot crawler traffic (visits by bot, status, path, day) from server access logs.",
+        "x-required-scope": "read:traffic",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/tags": {
+      "get": {
+        "summary": "Custom tag dimensions and values used to group monitored prompts.",
+        "x-required-scope": "read:prompts",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/audits": {
+      "get": {
+        "summary": "List GEO audits (history) for the tenant, newest first.",
+        "x-required-scope": "read:brand",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          }
+        ]
+      },
+      "post": {
+        "summary": "Trigger a GEO audit on a URL (async; returns 202 + auditId; credits settled by the audit pipeline).",
+        "x-required-scope": "write:audits",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "202": {
+            "description": "Accepted — async; poll the matching GET"
+          },
+          "400": {
+            "description": "Invalid parameter, or a disallowed audit URL (BLOCKED)"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "402": {
+            "$ref": "#/components/responses/InsufficientCredits"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "url"
+                ],
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "maxLength": 2048,
+                    "description": "Public URL to audit."
+                  },
+                  "keywords": {
+                    "type": "array",
+                    "maxItems": 50,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "deepAnalysis": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-charges-credits": true
+      }
+    },
+    "/products": {
+      "get": {
+        "summary": "Product catalog with each product’s latest AI-answer visibility (mention rate, avg rank, sentiment) plus the shopping-journey scores.",
+        "x-required-scope": "read:products",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "suggested",
+                "archived",
+                "all"
+              ]
+            },
+            "description": "Default \"active\"."
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          }
+        ]
+      }
+    },
+    "/products/{productId}/metrics-history": {
+      "get": {
+        "summary": "Daily AI-answer visibility time-series for one product (mention rate, avg rank, sentiment, co-occurring competitor products).",
+        "x-required-scope": "read:products",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/startDate"
+          },
+          {
+            "$ref": "#/components/parameters/endDate"
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          }
+        ]
+      }
+    },
+    "/audits/{auditId}": {
+      "get": {
+        "summary": "GEO audit status and scores for polling.",
+        "x-required-scope": "read:brand",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "name": "auditId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/prompts/{promptId}/scrape": {
+      "post": {
+        "summary": "Trigger a fresh scrape of a prompt across AI engines (async; 202). Charges prompt_monitor_run.",
+        "x-required-scope": "write:prompts",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "202": {
+            "description": "Accepted — async; poll the matching GET"
+          },
+          "400": {
+            "description": "Invalid parameter, or a disallowed audit URL (BLOCKED)"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "402": {
+            "$ref": "#/components/responses/InsufficientCredits"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "parameters": [
+          {
+            "name": "promptId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "engines": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "chatgpt",
+                        "gemini",
+                        "claude",
+                        "perplexity",
+                        "grok",
+                        "google_aio",
+                        "google_ai_mode",
+                        "copilot"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-charges-credits": true
+      }
+    }
+  }
+}

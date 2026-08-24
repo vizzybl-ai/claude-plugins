@@ -1,0 +1,10 @@
+{
+  "name": "vizzybl",
+  "owner": { "name": "Vizzybl" },
+  "plugins": [
+    {
+      "name": "vizzybl-geo",
+      "source": "./plugins/vizzybl-geo"
+    }
+  ]
+}
