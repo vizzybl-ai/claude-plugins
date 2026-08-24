@@ -16,6 +16,7 @@
       },
       "homepage": "https://vizzybl.ai/docs/claude-skill",
       "repository": "https://github.com/vizzybl-ai/claude-plugins",
+      "license": "MIT",
       "keywords": [
         "geo",
         "aeo",
