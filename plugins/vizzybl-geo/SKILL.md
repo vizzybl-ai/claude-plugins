@@ -23,6 +23,22 @@ Vizzybl public REST API. Vizzybl measures the **output** side of AI search — i
 covers **Claude natively** alongside ChatGPT, Gemini, Perplexity, Google AI
 Overviews, Grok and Copilot.
 
+## Commands
+
+Five task-specific commands cover the common workflows. Each is also a skill, so
+Claude can reach them directly:
+
+| Command | What it does |
+|---|---|
+| `/vizzybl-geo:pulse [days]` | Week-over-week share of voice, rank, and sentiment |
+| `/vizzybl-geo:answers [topic]` | Verbatim AI answers for monitored prompts, by engine |
+| `/vizzybl-geo:gaps [domain]` | Citation gaps — cited domains where yours isn't |
+| `/vizzybl-geo:scorecard [days]` | Per-engine visibility breakdown |
+| `/vizzybl-geo:audit <url>` | Run a GEO audit — **spends credits**, user-invoked only |
+
+Anything outside those five, answer from this skill directly using the endpoint
+reference below.
+
 ## Setup
 
 - **Base URL:** `https://vizzybl.ai/api/v1`

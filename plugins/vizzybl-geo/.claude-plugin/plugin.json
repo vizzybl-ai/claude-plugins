@@ -1,7 +1,7 @@
 {
   "name": "vizzybl-geo",
   "displayName": "Vizzybl GEO",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Query the Vizzybl public API for AI-search / GEO visibility — share of voice, monitored prompts, verbatim AI answers, and citations across ChatGPT, Claude, Gemini, Perplexity and Google AI Overviews.",
   "author": {
     "name": "Vizzybl"
@@ -15,5 +15,8 @@
     "ai-search",
     "brand-visibility",
     "vizzybl"
+  ],
+  "skills": [
+    "."
   ]
 }
