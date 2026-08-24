@@ -1,10 +1,29 @@
 {
   "name": "vizzybl",
-  "owner": { "name": "Vizzybl" },
+  "description": "Vizzybl plugins for Claude Code — measure and improve how your brand appears inside AI answer engines.",
+  "owner": {
+    "name": "Vizzybl",
+    "url": "https://vizzybl.ai"
+  },
   "plugins": [
     {
       "name": "vizzybl-geo",
-      "source": "./plugins/vizzybl-geo"
+      "displayName": "Vizzybl GEO",
+      "description": "Query the Vizzybl public API for AI-search / GEO visibility — share of voice, monitored prompts, verbatim AI answers, and citations across ChatGPT, Claude, Gemini, Perplexity and Google AI Overviews.",
+      "source": "./plugins/vizzybl-geo",
+      "author": {
+        "name": "Vizzybl"
+      },
+      "homepage": "https://vizzybl.ai/docs/claude-skill",
+      "repository": "https://github.com/vizzybl-ai/claude-plugins",
+      "keywords": [
+        "geo",
+        "aeo",
+        "ai-search",
+        "brand-visibility",
+        "vizzybl"
+      ],
+      "category": "productivity"
     }
   ]
 }
