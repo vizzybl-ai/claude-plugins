@@ -2,8 +2,8 @@
 name: vizzybl-geo
 description: >-
   Query the Vizzybl public API for a brand's GEO / AI-search visibility —
-  share-of-voice across ChatGPT, Claude, Gemini, Perplexity and Google AI
-  Overviews over time, the actual AI answers and citations for monitored
+  share-of-voice across ChatGPT, Claude, Gemini, Perplexity, Grok, Copilot,
+  Google AI Overviews and Google AI Mode over time, the actual AI answers and citations for monitored
   prompts, competitor visibility, the domains AI engines cite, and the product
   catalog's AI-answer visibility. Use whenever the user asks how their brand shows
   up in AI answers, their AI share-of-voice / ranking / sentiment trend, what an AI
@@ -20,8 +20,8 @@ allowed-tools: Bash(curl *)
 
 Answer questions about how a brand appears inside AI answer engines using the
 Vizzybl public REST API. Vizzybl measures the **output** side of AI search — it
-covers **Claude natively** alongside ChatGPT, Gemini, Perplexity, Google AI
-Overviews, Grok and Copilot.
+covers **Claude natively** alongside ChatGPT, Gemini, Perplexity, Grok,
+Copilot, Google AI Overviews and Google AI Mode.
 
 ## Commands
 

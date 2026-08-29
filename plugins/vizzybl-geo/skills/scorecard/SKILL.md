@@ -1,6 +1,6 @@
 ---
 name: scorecard
-description: Per-engine visibility scorecard — share of voice and trend broken down by ChatGPT, Claude, Gemini, Perplexity, and Google AI Overviews.
+description: Per-engine visibility scorecard — share of voice and trend broken down by ChatGPT, Claude, Gemini, Perplexity, Grok, Copilot, Google AI Overviews and Google AI Mode.
 argument-hint: "[days]"
 allowed-tools: Bash(curl *)
 ---
