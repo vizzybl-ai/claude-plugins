@@ -1,0 +1,21 @@
+{
+  "name": "vizzybl",
+  "displayName": "Vizzybl",
+  "version": "1.0.0",
+  "description": "See how your brand shows up in AI answers across ChatGPT, Claude, Gemini, Perplexity, Grok, Copilot, Google AI Overviews and Google AI Mode: share of voice, rank, sentiment, what each engine said, which sources they cite, and what to fix.",
+  "author": {
+    "name": "Vizzybl",
+    "url": "https://vizzybl.ai"
+  },
+  "homepage": "https://vizzybl.ai/docs/integrations/mcp",
+  "repository": "https://github.com/vizzybl-ai/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "geo",
+    "aeo",
+    "ai-search",
+    "brand-visibility",
+    "share-of-voice",
+    "vizzybl"
+  ]
+}

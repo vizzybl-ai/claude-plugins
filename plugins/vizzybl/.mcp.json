@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "vizzybl": {
+      "type": "http",
+      "url": "https://mcp.vizzybl.ai/v1/mcp"
+    }
+  }
+}
