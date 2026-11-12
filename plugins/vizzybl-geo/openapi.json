@@ -348,6 +348,10 @@
                     "type": "string",
                     "description": "ISO country code. Defaults to US."
                   },
+                  "language": {
+                    "type": "string",
+                    "description": "The language the prompts are written in (e.g. fr, de, pt). Optional. An unknown code returns 400 INVALID_PARAM."
+                  },
                   "preview": {
                     "type": "boolean",
                     "description": "Dry run — reports what would be created without writing."

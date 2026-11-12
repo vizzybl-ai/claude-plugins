@@ -117,7 +117,9 @@ Daily share-of-voice history, newest first.
 ```
 - `shareOfVoice` — 0–100 % of category mentions that are the brand.
 - `rank` — brand's rank among detected brands (lower is better; may be `null`).
-- `sentimentScore` — −100..+100 (may be `null`).
+- `sentimentScore` — −100..+100 (may be `null`). On a competitor it is `null`
+  unless competitor sentiment is scored for the brand (paid plans) and at least
+  3 of that day's answers naming the competitor were scored.
 
 ## `GET /prompts`  ·  scope `read:prompts`
 Monitored prompts, newest first.
@@ -329,7 +331,14 @@ audit pipeline, not at request time. Errors: `400 INVALID_PARAM`, `400 BLOCKED`
 ## `POST /prompts`  ·  scope `write:prompts`  ·  heavy  ·  **free**
 Create monitored prompts in a batch. Dedups by prompt-text hash.
 **Body:** `texts[]` (required, 1–50 entries, each ≤2000 chars), `country` (ISO,
-defaults to `US`), `preview` (boolean).
+defaults to `US`), `language` (the language the prompts are WRITTEN in, e.g.
+`fr`; optional), `preview` (boolean).
+
+`language` matters for Google AI Overviews and Google AI Mode, which answer from
+results in that language. Send it whenever the prompts are not in the brand's
+primary language. An unknown code returns `400 INVALID_PARAM`. Omitted, the
+stored language is the brand's primary language where that default is switched
+on for the workspace, and `en` otherwise.
 
 With `"preview": true` it returns `200` and writes nothing:
 ```json
@@ -361,7 +370,7 @@ Poll `GET /prompts/{promptId}` for updated metrics. Errors: `404 NOT_FOUND`,
 ## Enrichments on existing endpoints
 - **`GET /stats`** also returns `brandCoverage` + `domainCoverage` (0–1).
 - **`GET /visibility?byEngine=true`** adds a per-engine `byEngine` map to each day (best-effort; `null` when no rollup).
-- **`GET /prompt-responses`** adds `sentimentBreakdown`, `mentionSentiments`, `classifiedCitations` (with `sourceType`), `competitorMetrics`, `domainCitationCount`, and `runId`.
+- **`GET /prompt-responses`** adds `sentimentBreakdown`, `mentionSentiments`, `classifiedCitations` (with `sourceType`), `competitorMetrics`, `domainCitationCount`, and `runId`. Each `competitorMetrics[domain]` is `{ mentionCount, citationCount, sentimentScore }`: `sentimentScore` (−100..+100) is how THAT answer portrays the competitor, or `null` when it was not scored (competitor sentiment is a paid-plan feature, and a competitor that is only cited has no text to score).
 - **`GET /citations`** items now carry `sourceType`, and accept `startDate`/`endDate`.
 
 ---
